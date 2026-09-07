@@ -1,0 +1,38 @@
+# MCPs de Huawei Cloud — compose standalone.
+# Para levantar:  cp .env.example .env  &&  (editá AK/SK)  &&  docker compose up -d --build
+#
+# Una vez arriba:
+#   - hwc-ops-mcp:   http://localhost:8888   (streamable HTTP en /mcp)
+#   - terraform-mcp: http://localhost:8088   (streamable HTTP en /mcp)
+#
+# Si integrás con agent-huawei-cloud, apuntá MCP_HUAWEI_URL y MCP_TERRAFORM_URL
+# a estos service names (misma red de compose) o a localhost:8888/8088.
+
+services:
+  # MCP de Huawei Cloud Ops (ECS/VPC/OBS/IAM/...) + BSS (billing/cost).
+  # Build local autocontenido (ver hwc-ops-bss/Dockerfile).
+  hwc-ops-mcp:
+    build: ./hwc-ops-bss
+    image: hwc-ops-bss:dev
+    command: ["-t", "http", "-p", "8080"]
+    environment:
+      # Cuenta de fallback (modo single-tenant). Con credenciales por request
+      # activadas (HWC_REQUIRE_PER_REQUEST_CREDS=1) el contenedor no guarda
+      # secretos: las manda la app por header en cada call.
+      HUAWEI_ACCESS_KEY: ${HUAWEI_ACCESS_KEY:-}
+      HUAWEI_SECRET_KEY: ${HUAWEI_SECRET_KEY:-}
+      HUAWEI_REGION: ${HUAWEI_REGION:-la-south-2}
+      HWC_REQUIRE_PER_REQUEST_CREDS: ${HWC_REQUIRE_PER_REQUEST_CREDS:-0}
+    ports:
+      - "8888:8080"
+    restart: unless-stopped
+
+  # MCP de Terraform (registry lookups: módulos/providers/versiones).
+  # Imagen Go del SWR de Huawei. Streamable HTTP en /mcp.
+  # Si no tenés acceso al SWR, mirá terraform-mcp/README.md alternativas.
+  terraform-mcp:
+    image: swr.la-south-2.myhuaweicloud.com/imagenes-varias/terraform-mcp-server:dev
+    command: ["streamable-http", "--transport-host", "0.0.0.0", "--transport-port", "8080"]
+    ports:
+      - "8088:8080"
+    restart: unless-stopped

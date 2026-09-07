@@ -1,0 +1,28 @@
+# MCP runtime
+mcp==1.27.1
+fastmcp==3.3.1
+uvicorn==0.47.0
+starlette==1.0.0
+sse-starlette==3.4.4
+httpx==0.28.1
+httpx-sse==0.4.3
+pydantic==2.13.4
+pydantic-settings==2.14.1
+openapi-pydantic==0.5.1
+pyyaml>=6.0
+
+# Huawei Cloud SDKs
+huaweicloudsdkcore==3.1.212
+huaweicloudsdkecs==3.1.195
+huaweicloudsdkvpc==3.1.195
+huaweicloudsdkeip==3.1.195
+huaweicloudsdkevs==3.1.195
+huaweicloudsdkiam==3.1.195
+huaweicloudsdkims==3.1.195
+huaweicloudsdkelb==3.1.195
+huaweicloudsdkces==3.1.195
+huaweicloudsdkcts==3.1.195
+huaweicloudsdkdns==3.1.195
+huaweicloudsdklts==3.1.195
+huaweicloudsdkcbr==3.1.195
+huaweicloudsdkbssintl==3.1.212
