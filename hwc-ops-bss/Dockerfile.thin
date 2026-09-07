@@ -1,0 +1,18 @@
+# hwc-ops-bss — capa fina sobre la imagen base del SWR de Huawei.
+#
+# Para máquinas con acceso a swr.la-south-2.myhuaweicloud.com: mucho más rápido
+# y liviano que el Dockerfile autocontenido (no reinstala todas las SDKs desde pip).
+# Suma huaweicloudsdkbssintl + los 3 archivos de la extensión sobre la base.
+#
+# Build:  docker build -t hwc-ops-bss:dev -f Dockerfile.thin ./hwc-ops-bss
+FROM swr.la-south-2.myhuaweicloud.com/imagenes-varias/mcp-server-hwc-ops:dev
+
+USER root
+RUN pip install --no-cache-dir huaweicloudsdkbssintl==3.1.212
+
+# Extensión (vive en este repo → single source of truth)
+COPY mcp_server_hwc_ops/per_request_creds.py /usr/local/lib/python3.12/site-packages/mcp_server_hwc_ops/per_request_creds.py
+COPY mcp_server_hwc_ops/bss_tools.py /usr/local/lib/python3.12/site-packages/mcp_server_hwc_ops/bss_tools.py
+COPY entrypoint.py /app/entrypoint.py
+
+ENTRYPOINT ["python3", "/app/entrypoint.py"]
