@@ -173,9 +173,11 @@ def bss_list_resource_records(
 
 @mcp.tool()
 def bss_total_cost(cycle: Optional[str] = None) -> str:
-    """Total billed spend for a cycle (YYYY-MM, default current month) broken down
-    by service. Returns {cycle, total, by_service:[{service_type, label, amount,
-    resource_count}]}. Useful for 'cuánto gasté este mes'."""
+    """Total billed spend for a cycle (YYYY-MM, default current month), with a
+    per-SERVICE summary. This is the cheap, default answer for spend questions:
+    'cuánto gasté', 'gasto por servicio', 'la factura del mes'. Does NOT list
+    individual resources — for that use bss_cycle_breakdown.
+    Returns {cycle, total, by_service:[{service_type, label, amount, resource_count}]}."""
     cyc = _cycle(cycle)
     recs = _fetch_records(cyc)
     by: dict = {}
@@ -205,11 +207,13 @@ def bss_total_cost(cycle: Optional[str] = None) -> str:
 
 @mcp.tool()
 def bss_cycle_breakdown(cycle: Optional[str] = None) -> str:
-    """Full billing breakdown for a cycle (YYYY-MM, default current month): by
-    service AND by resource. Includes deleted resources (BSS keeps historical
-    names). usage_measure_id=6 → seconds → hours=usage/3600. Returns
-    {cycle, total, by_service:[{service_type, label, amount, resource_count,
-    resources:[{id,name,amount,hours,region,resource_type}]}]}."""
+    """Per-RESOURCE billing detail for a cycle (YYYY-MM, default current month).
+    Use it only when the question is about individual resources: 'qué recurso me
+    está costando más', 'detalle por recurso', 'desglose recurso por recurso'.
+    Es más caro que bss_total_cost — pagina todos los fee records. Includes
+    deleted resources (BSS keeps historical names). usage_measure_id=6 → seconds
+    → hours=usage/3600. Returns {cycle, total, by_service:[{service_type, label,
+    amount, resource_count, resources:[{id,name,amount,hours,region,resource_type}]}]}."""
     cyc = _cycle(cycle)
     recs = _fetch_records(cyc)
     by_svc: dict = {}
